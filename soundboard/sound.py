@@ -54,8 +54,37 @@ class SoundBite(UserControl):
         )
     def mount(self, page: ft.Page):
         page.overlay.append(self.audio)
+    def name_click(self):
+        self.display_name.visible = False
+        self.edit_name.visible = True
+        self.update()
+        self.edit_name.controls[0].focus()
+
+    def name_change(self):
+        self.name = self.edit_name.controls[0].value
+        self.display_name.visible = True
+        self.edit_name.visible = False
+        self.display_name.text = self.name
+        self.update()
+        self.global_ui.sound_bite_change()
 
     def build(self):
+        self.display_name = ft.TextButton(
+            text=self.name, on_click=lambda _: self.name_click()
+        )
+        self.edit_name = ft.Column(
+            [
+                TextField(
+                    value=self.name,
+                    on_submit=lambda _: self.name_change(),
+                ),
+                ft.IconButton(
+                    icon=icons.SAVE,
+                    on_click=lambda _: self.name_change(),
+                ),
+            ],
+            visible=False,
+        )
         self.play_button = IconButton(
             icon=icons.PLAY_ARROW,
             selected_icon=icons.STOP,
@@ -69,11 +98,11 @@ class SoundBite(UserControl):
             max=1,
             on_change=lambda _: self.volume_change(),
         )
-        self.elements = [(
-            ft.Text(self.name)
-        ),
-        self.volume_slider,
-        self.play_button
+        self.elements = [
+            self.display_name,
+            self.edit_name,
+            self.volume_slider,
+            self.play_button
         ]
 
         if self.type == SoundType.MUSIC:

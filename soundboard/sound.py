@@ -3,8 +3,6 @@ import flet as ft
 
 from typing import Any
 from flet import (
-    Checkbox,
-    Column,
     IconButton,
     TextField,
     Row,
@@ -13,30 +11,32 @@ from flet import (
     icons,
 )
 
+
 class SoundType(Enum):
-    MUSIC = "Music"
+    BACKGROUND = "Background"
     EFFECT = "Effect"
+
 
 class ReleaseMode(Enum):
     RELEASE = "release"
     LOOP = "loop"
     STOP = "stop"
 
+
 class SoundBite(UserControl):
-    def __init__(self,
-                name: str,
-                path: str,
-                sound_type: SoundType = SoundType.MUSIC,
-                global_volume_slider: ft.Slider = None,
-                global_ui = None,
-                **kwargs: Any
-                ):
+    def __init__(
+        self,
+        name: str,
+        path: str,
+        global_volume_slider: ft.Slider = None,
+        global_ui=None,
+        **kwargs: Any
+    ):
         super().__init__(**kwargs)
         self.name = name
         self.path = path
-        self.type = sound_type
         self.global_volume_slider = global_volume_slider
-        self.global_ui = global_ui # Hacky way to get access to the UI
+        self.global_ui = global_ui  # Hacky way to get access to the UI
 
         # Controls
         self.playing = False
@@ -49,9 +49,10 @@ class SoundBite(UserControl):
             src=self.path,
             autoplay=False,
             balance=0,
-            volume=self.default_volume*self.global_volume_slider.value,
+            volume=self.default_volume * self.global_volume_slider.value,
             on_state_changed=lambda e: self.state_change(e),
         )
+
     def mount(self, page: ft.Page):
         page.overlay.append(self.audio)
     def name_click(self):
@@ -68,7 +69,25 @@ class SoundBite(UserControl):
         self.update()
         self.global_ui.sound_bite_change()
 
+<<<<<<< Updated upstream
     def build(self):
+=======
+    def name_click(self):
+        self.display_name.visible = False
+        self.edit_name.visible = True
+        self.update()
+        self.edit_name.controls[0].focus()
+
+    def name_change(self):
+        self.name = self.edit_name.controls[0].value
+        self.display_name.visible = True
+        self.edit_name.visible = False
+        self.display_name.text = self.name
+        self.update()
+        self.global_ui.sound_bite_change()
+
+    def build_components(self):
+>>>>>>> Stashed changes
         self.display_name = ft.TextButton(
             text=self.name, on_click=lambda _: self.name_click()
         )
@@ -85,49 +104,64 @@ class SoundBite(UserControl):
             ],
             visible=False,
         )
+<<<<<<< Updated upstream
+=======
+        self.move_button = IconButton(
+            icon=icons.ARROW_FORWARD,
+            on_click=lambda _: self.global_ui.move_sound(self),
+            style=ft.ButtonStyle(color={colors.BLUE}),
+        )
+>>>>>>> Stashed changes
         self.play_button = IconButton(
             icon=icons.PLAY_ARROW,
             selected_icon=icons.STOP,
             on_click=lambda _: self.play_toggle(),
             selected=self.playing,
-            style=ft.ButtonStyle(color={"selected": colors.LIGHT_BLUE, "": colors.BLUE})
-            )
+            style=ft.ButtonStyle(
+                color={"selected": colors.LIGHT_BLUE, "": colors.BLUE}
+            ),
+        )
         self.volume_slider = ft.Slider(
             value=self.default_volume,
             min=0,
             max=1,
             on_change=lambda _: self.volume_change(),
         )
+<<<<<<< Updated upstream
         self.elements = [
             self.display_name,
             self.edit_name,
             self.volume_slider,
             self.play_button
         ]
+=======
+        self.pause_button = IconButton(
+            icon=icons.PAUSE,
+            selected_icon=icons.PAUSE,
+            on_click=lambda _: self.pause_toggle(),
+            selected=self.paused,
+            style=ft.ButtonStyle(
+                color={"selected": colors.LIGHT_BLUE, "": colors.BLUE}
+            ),
+        )
+        if self.paused:
+            self.pause_button.bgcolor = colors.LIGHT_BLUE
+        self.loop_button = IconButton(
+            icon=icons.LOOP,
+            selected_icon=icons.LOOP,
+            on_click=lambda _: self.loop_toggle(),
+            selected=self.looping,
+            style=ft.ButtonStyle(
+                color={"selected": colors.LIGHT_BLUE, "": colors.BLUE}
+            ),
+        )
+        if self.looping:
+            self.loop_button.bgcolor = colors.LIGHT_BLUE
+>>>>>>> Stashed changes
 
-        if self.type == SoundType.MUSIC:
-            self.pause_button = IconButton(
-                    icon=icons.PAUSE,
-                    selected_icon=icons.PAUSE,
-                    on_click=lambda _: self.pause_toggle(),
-                    selected=self.paused,
-                    style=ft.ButtonStyle(color={"selected": colors.LIGHT_BLUE, "": colors.BLUE})
-                )
-            if self.paused:
-                self.pause_button.bgcolor = colors.LIGHT_BLUE
-            self.loop_button = IconButton(
-                icon=icons.LOOP,
-                selected_icon=icons.LOOP,
-                on_click=lambda _: self.loop_toggle(),
-                selected=self.looping,
-                style=ft.ButtonStyle(color={"selected": colors.LIGHT_BLUE, "": colors.BLUE})
-            )
-            if self.looping:
-                self.loop_button.bgcolor = colors.LIGHT_BLUE
-            self.elements.append(self.pause_button)
-            self.elements.append(self.loop_button)
-
-        return (Row(self.elements))
+    def build(self):
+        "Empty build for abstract class"
+        return Row()
 
     def hard_stop(self):
         self.audio.pause()
@@ -203,3 +237,42 @@ class SoundBite(UserControl):
             self.playing = False
             self.paused = False
             self.select_button()
+
+
+class BackgroundSound(SoundBite):
+    def __init__(self, path, name, global_ui, global_volume_slider):
+        super().__init__(
+            path=path,
+            name=name,
+            global_ui=global_ui,
+            global_volume_slider=global_volume_slider,
+        )
+        self.type = SoundType.BACKGROUND
+
+    def build(self):
+        super().build_components()
+        self.elements = [
+            self.display_name,
+            self.edit_name,
+            self.move_button,
+            self.volume_slider,
+            self.play_button,
+            self.pause_button,
+            self.loop_button,
+        ]
+
+        return Row(self.elements)
+
+
+class EffectSound(SoundBite):
+    def __init__(self, path, name, global_ui, global_volume_slider):
+        super().__init__(path, name, global_ui, global_volume_slider)
+        self.type = SoundType.EFFECT
+
+    def build(self):
+        super().build_components()
+        self.elements = [
+            ft.Row([self.display_name, self.edit_name, self.move_button]),
+            ft.Row([self.play_button, self.volume_slider]),
+        ]
+        return Row(self.elements)

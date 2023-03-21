@@ -3,6 +3,7 @@ import flet as ft
 from flet import UserControl
 from typing import Any
 
+from pathlib import Path
 from soundboard.data_store import DataStore
 from soundboard.sound import SoundBite
 
@@ -56,7 +57,8 @@ class UserInterface(UserControl):
             sound.volume_change()
 
     def add_sound(self, file: str):
-        bite = SoundBite(name = file, path = file, global_volume_slider=self.global_volume_slider, global_ui=self)
+        name = Path(file).stem
+        bite = SoundBite(name = name, path = file, global_volume_slider=self.global_volume_slider, global_ui=self)
         self.sounds.controls.append(bite)
         self.update()
         bite.mount(self.page)

@@ -44,9 +44,12 @@ class UserInterface(UserControl):
                     text="Pick Files",
                     on_click=lambda _: self.pick_files_dialog.pick_files(allow_multiple=True),
                 ),
+                ft.Row([
                 self.all_play_button,
                 self.all_pause_button,
                 self.global_volume_slider,
+                ],
+                ),
             ]
         )
         self.sounds = ft.Column()
@@ -76,8 +79,7 @@ class UserInterface(UserControl):
         else:
             for sound in self.sounds.controls:
                 sound.hard_play()
-        self.playing = not self.playing
-        self.button_update()
+        self.sound_bite_change()
 
     def all_pause_toggle(self):
         if self.paused:
@@ -86,8 +88,7 @@ class UserInterface(UserControl):
         else:
             for sound in self.sounds.controls:
                 sound.hard_pause()
-        self.paused = not self.paused
-        self.button_update()
+        self.sound_bite_change()
 
     def button_update(self):
         self.all_play_button.selected = self.playing
@@ -97,6 +98,7 @@ class UserInterface(UserControl):
 
     def sound_bite_change(self):
         self.playing = any([sound.playing for sound in self.sounds.controls])
+        self.paused = all([sound.paused for sound in self.sounds.controls])
         self.button_update()
 
 

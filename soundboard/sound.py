@@ -61,7 +61,7 @@ class SoundBite(UserControl):
         self.edit_name.controls[0].focus()
 
     def name_change(self):
-        self.name = self.edit_name.controls[0].value
+        self.name = self.edit_name.controls[0].value[:20]
         self.display_name.visible = True
         self.edit_name.visible = False
         self.display_name.text = self.name
@@ -70,7 +70,9 @@ class SoundBite(UserControl):
 
     def build(self):
         self.display_name = ft.TextButton(
-            text=self.name, on_click=lambda _: self.name_click()
+            text=self.name[:20],
+            on_click=lambda _: self.name_click(),
+            expand=True,
         )
         self.edit_name = ft.Column(
             [
@@ -84,6 +86,7 @@ class SoundBite(UserControl):
                 ),
             ],
             visible=False,
+            expand=True,
         )
         self.play_button = IconButton(
             icon=icons.PLAY_ARROW,

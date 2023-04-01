@@ -101,6 +101,10 @@ class SoundBite(UserControl):
             max=1,
             on_change=lambda _: self.volume_change(),
         )
+        self.delete_button = ft.IconButton(
+            icon=icons.DELETE,
+            on_click=lambda _: self.delete(),
+        )
         self.elements = [
             self.display_name,
             self.edit_name,
@@ -129,7 +133,7 @@ class SoundBite(UserControl):
                 self.loop_button.bgcolor = colors.LIGHT_BLUE
             self.elements.append(self.pause_button)
             self.elements.append(self.loop_button)
-
+        self.elements.append(self.delete_button)
         return (Row(self.elements))
 
     def hard_stop(self):
@@ -206,3 +210,8 @@ class SoundBite(UserControl):
             self.playing = False
             self.paused = False
             self.select_button()
+
+    def delete(self):
+        self.audio.release()
+        self.global_ui.sounds.controls.remove(self)
+        self.global_ui.sound_bite_change()
